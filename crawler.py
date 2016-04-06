@@ -19,6 +19,7 @@
 import urllib.request
 import re
 import sys
+import os.path
 
 #Definition de constantes utiles
 
@@ -28,6 +29,7 @@ ENDC = '\033[0m'
 OKGREEN = '\033[92m'
 OKBLUE = '\033[94m'
 BOLD = '\033[1m'
+FAIL = '\033[91m'
 
 websites = {'xssed' : [], 'dmoz' : []}
 
@@ -61,6 +63,38 @@ def xssed_crawl(nb_website):
     sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website) + " / " + str(nb_website) + ENDC + ' '*10 + BOLD + OKGREEN + 'Termine !' + ENDC + '\n\n')
 
 
+def dmoz_crawl(nb_website):
+
+    print(BOLD + OKGREEN + "Crawling des pages non inféctés depuis DMOZ" + ENDC + '\n')
+
+    if(not os.path.isfile("content.rdf.u8")):
+        print(BOLD + FAIL + "Le fichier content.rdf.u8 n'a pas été trouvé il sera téléchargé " + ENDC)
+        print("Veuillez patientez ... ")
+
+        urllib.request.urlretrieve("http://rdf.dmoz.org/rdf/content.rdf.u8.gz", "content.rdf.u8")
+        print(BOLD + OKGREEN + "Telechargement terminé !")
+    print("Debut du Crawling")
+
+    website_remaining = nb_website
+
+    #Normalement il y a un module XML qui est beaucup plus adapté
+    #Mais le fichier est beaucoup trop volumineux (1.7 Go) et je n'ai que 3Go au moment du dévlopement x)
+    for line in open("content.rdf.u8"):
+        if('r:resource="' in line):
+
+            try:
+                websites['dmoz'].append(urllib.request.urlopen(line[line.find('r:resource="') + len('r:resource="'):line.find('>') - 1]).read().decode('latin-1'))
+            except:
+                continue
+
+            website_remaining -= 1
+            sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - website_remaining) + " / " + str(nb_website) + ENDC + ' '*20) #Multiplication par 20 pour vider correctement la ligne x) 
+            if(not website_remaining):
+                break
+
+    print(websites['dmoz'])
+        
+
 #Test
-xssed_crawl(10)                      
+dmoz_crawl(10)                      
         
