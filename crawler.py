@@ -18,12 +18,27 @@
 
 import urllib.request
 import re
+import sys
 
-def xssd_crawl(nb_website):
-    websites = []
+#Definition de constantes utiles
 
+#Couleur
+HEADER = '\033[95m'
+ENDC = '\033[0m'
+OKGREEN = '\033[92m'
+OKBLUE = '\033[94m'
+BOLD = '\033[1m'
+
+websites = {'xssed' : [], 'dmoz' : []}
+
+def xssed_crawl(nb_website):
+
+    print(BOLD + OKGREEN + "Crawling des pages inféctés depuis www.xssed.com" + ENDC + '\n')
+
+    websites_remaining = nb_website
     page = 1
-    while(nb_website):
+
+    while(websites_remaining):
         parentHtml = urllib.request.urlopen('http://www.xssed.com/archive/page=' + str(page) + '/').read().decode('utf-8')
          
         for website in [m.start() + len("/mirror/") for m in re.finditer("/mirror/", parentHtml)]:
@@ -33,15 +48,19 @@ def xssd_crawl(nb_website):
             vulnUrl = mirrorHtml[mirrorHtml.find("http://vuln.xssed.net/"):mirrorHtml.find('"', mirrorHtml.find("http://vuln.xssed.net/"))]
             vulnHtml = urllib.request.urlopen(vulnUrl).read().decode('latin-1')
 
-            websites.append(vulnHtml)
+            websites['xssed'].append(vulnHtml)
+            sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - websites_remaining + 1) + " / " + str(nb_website) + ENDC + ' '*20) #Multiplication par 20 pour vider correctement la ligne x) 
+            sys.stdout.flush()
 
-            nb_website -= 1
-            if(not nb_website):
+            websites_remaining -= 1
+            if(not websites_remaining):
                 break;
                 
         page += 1
+    
+    sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website) + " / " + str(nb_website) + ENDC + ' '*10 + BOLD + OKGREEN + 'Termine !' + ENDC + '\n\n')
 
 
 #Test
-xssd_crawl(10)                      
+xssed_crawl(10)                      
         
