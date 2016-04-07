@@ -41,17 +41,29 @@ def xssed_crawl(nb_website):
     page = 1
 
     while(websites_remaining):
-        parentHtml = urllib.request.urlopen('http://www.xssed.com/archive/page=' + str(page) + '/').read().decode('utf-8')
-         
+
+        try:
+            parentHtml = urllib.request.urlopen('http://www.xssed.com/archive/page=' + str(page) + '/').read().decode('utf-8')
+        except:
+            continue
+
         for website in [m.start() + len("/mirror/") for m in re.finditer("/mirror/", parentHtml)]:
             mirrorInd = parentHtml[website:parentHtml.find("/", website)]
-            mirrorHtml = urllib.request.urlopen('http://www.xssed.com/mirror/' + str(mirrorInd) + '/').read().decode('utf-8')
+            
+            try:
+                mirrorHtml = urllib.request.urlopen('http://www.xssed.com/mirror/' + str(mirrorInd) + '/').read().decode('utf-8')
+            except:
+                continue
 
             vulnUrl = mirrorHtml[mirrorHtml.find("http://vuln.xssed.net/"):mirrorHtml.find('"', mirrorHtml.find("http://vuln.xssed.net/"))]
-            vulnHtml = urllib.request.urlopen(vulnUrl).read().decode('latin-1')
+            
+            try:
+                vulnHtml = urllib.request.urlopen(vulnUrl).read().decode('latin-1')
+            except:
+                continue
 
             websites['xssed'].append(vulnHtml)
-            sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - websites_remaining + 1) + " / " + str(nb_website) + ENDC + ' '*20) #Multiplication par 20 pour vider correctement la ligne x) 
+            sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - websites_remaining + 1) + " / " + str(nb_website) + ENDC) 
             sys.stdout.flush()
 
             websites_remaining -= 1
@@ -61,7 +73,6 @@ def xssed_crawl(nb_website):
         page += 1
     
     sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website) + " / " + str(nb_website) + ENDC + ' '*10 + BOLD + OKGREEN + 'Termine !' + ENDC + '\n\n')
-
 
 def dmoz_crawl(nb_website):
 
@@ -88,12 +99,12 @@ def dmoz_crawl(nb_website):
                 continue
 
             website_remaining -= 1
-            sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - website_remaining) + " / " + str(nb_website) + ENDC + ' '*20) #Multiplication par 20 pour vider correctement la ligne x) 
+            sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - website_remaining) + " / " + str(nb_website) + ENDC)
             if(not website_remaining):
                 break
-
-    print(websites['dmoz'])
-        
+    
+    sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website) + " / " + str(nb_website) + ENDC + ' '*10 + BOLD + OKGREEN + 'Termine !' + ENDC + '\n\n')
+    print(websites['dmoz'])        
 
 #Test
 dmoz_crawl(10)                      
