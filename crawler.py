@@ -20,8 +20,8 @@ import urllib.request
 import re
 import sys
 import os.path
-import jsbeautifier
-
+import deobfusc
+ 
 #Definition de constantes utiles
 
 #Couleur
@@ -63,7 +63,7 @@ def xssed_crawl(nb_website):
             except:
                 continue
 
-            websites['xssed'].append(vulnHtml)
+            websites['xssed'].append( ( deobfusc.decode(vulnUrl), deobfusc.decode(vulnHtml) ) )
             sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - websites_remaining + 1) + " / " + str(nb_website) + ENDC) 
             sys.stdout.flush()
 
@@ -95,7 +95,9 @@ def dmoz_crawl(nb_website):
         if('r:resource="' in line):
 
             try:
-                websites['dmoz'].append(urllib.request.urlopen(line[line.find('r:resource="') + len('r:resource="'):line.find('>') - 1]).read().decode('latin-1'))
+                urlW = line[line.find('r:resource="') + len('r:resource="'):line.find('>') - 1]
+                htmlW = urllib.request.urllopen(urlW).read().decode('latin-1')
+                websites['dmoz'].append((deobfusc.decode(urlW), deobfusc.decode(htmlW)))
             except:
                 continue
 
@@ -106,25 +108,7 @@ def dmoz_crawl(nb_website):
     
     sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website) + " / " + str(nb_website) + ENDC + ' '*10 + BOLD + OKGREEN + 'Termine !' + ENDC + '\n\n')
 
-def deobfusc(code):
-    """ Ce module est là pour déobfuscer le code javascript il n'est pas trés efficace 
-    Il se base sur la lib de JSBeautifuler est decode les StringToCharCode 
-    Un process de deobfuc plus efficace basé sur une analyse dynamique sera dévloppé prochainement
-    Pour le moment je ferai avec ca x) """
-    
-    code = jsbeautifier.beautify(code)   
-    while "String.fromCharCode" in code:
-        pos = code.find("String.fromCharCode")
-        hiddenStr = code[code.find("(", pos) + 1:code.find(")", pos)]
-        hiddenStr = hiddenStr.split(',')
-        hiddenStr = [ int(x) for x in hiddenStr ]
-       
-        code = code[:pos] + ''.join(map(chr, hiddenStr)) + code[code.find(")", pos) + 1:] 
-    return code
-
-
 #Test
 
-deobfusc('String.fromCharCode(72,101,108,108,111,32,87,111,114,108,100)')
-                     
-        
+xssed_crawl(10)
+dmoz_crawl(10) 
