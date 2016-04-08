@@ -20,6 +20,7 @@ import urllib.request
 import re
 import sys
 import os.path
+import jsbeautifier
 
 #Definition de constantes utiles
 
@@ -104,8 +105,26 @@ def dmoz_crawl(nb_website):
                 break
     
     sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website) + " / " + str(nb_website) + ENDC + ' '*10 + BOLD + OKGREEN + 'Termine !' + ENDC + '\n\n')
-    print(websites['dmoz'])        
+
+def deobfusc(code):
+    """ Ce module est là pour déobfuscer le code javascript il n'est pas trés efficace 
+    Il se base sur la lib de JSBeautifuler est decode les StringToCharCode 
+    Un process de deobfuc plus efficace basé sur une analyse dynamique sera dévloppé prochainement
+    Pour le moment je ferai avec ca x) """
+    
+    code = jsbeautifier.beautify(code)   
+    while "String.fromCharCode" in code:
+        pos = code.find("String.fromCharCode")
+        hiddenStr = code[code.find("(", pos) + 1:code.find(")", pos)]
+        hiddenStr = hiddenStr.split(',')
+        hiddenStr = [ int(x) for x in hiddenStr ]
+       
+        code = code[:pos] + ''.join(map(chr, hiddenStr)) + code[code.find(")", pos) + 1:] 
+    return code
+
 
 #Test
-dmoz_crawl(10)                      
+
+deobfusc('String.fromCharCode(72,101,108,108,111,32,87,111,114,108,100)')
+                     
         
