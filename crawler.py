@@ -20,6 +20,8 @@ import urllib.request
 import re
 import sys
 import os.path
+import pickle
+
 import deobfusc
  
 #Definition de constantes utiles
@@ -122,7 +124,11 @@ def getSuspFeatures(url, code):
     1) Nombre de domaines .
     2) Caracteres duppliqués
     3) Mot clés suspects """
-    return (len(re.findall('([0-9A-Za-z_-]+\\.){2}[0-9A-Za-z_-]+')) + len(re.findall('([0-9]+\\.){3}[0-9]+'))), ('<<' in (url + code) || '>>' in (url + code) )
+    return (len(re.findall('([0-9A-Za-z_-]+\\.){2}[0-9A-Za-z_-]+')) + len(re.findall('([0-9]+\\.){3}[0-9]+'))), ('<<' in (url + code) or '>>' in (url + code) )
     
 #Test
+xssed_crawl(1)
+dmoz_crawl(1)
 
+f = open('xss_dataset.pickle', 'wb')
+pickle.dump(websites, f)
