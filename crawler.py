@@ -127,8 +127,8 @@ def getSuspFeatures(url, code):
     return (len(re.findall('([0-9A-Za-z_-]+\\.){2}[0-9A-Za-z_-]+')) + len(re.findall('([0-9]+\\.){3}[0-9]+'))), ('<<' in (url + code) or '>>' in (url + code) )
     
 #Test
-xssed_crawl(1)
-dmoz_crawl(1)
+xssed_crawl(45000)
+dmoz_crawl(45000)
 
 f = open('xss_dataset.pickle', 'wb')
 pickle.dump(websites, f)
