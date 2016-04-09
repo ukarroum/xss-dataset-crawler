@@ -34,6 +34,8 @@ FAIL = '\033[91m'
 
 websites = {'xssed' : [], 'dmoz' : []}
 
+features = []
+
 def xssed_crawl(nb_website):
 
     print(BOLD + OKGREEN + "Crawling des pages inféctés depuis www.xssed.com" + ENDC + '\n')
@@ -63,7 +65,7 @@ def xssed_crawl(nb_website):
             except:
                 continue
 
-            websites['xssed'].append( ( deobfusc.decode(vulnUrl), deobfusc.decode(vulnHtml) ) )
+            websites['xssed'].append( ( vulnUrl, vulnHtml ) )
             sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - websites_remaining + 1) + " / " + str(nb_website) + ENDC) 
             sys.stdout.flush()
 
@@ -97,7 +99,7 @@ def dmoz_crawl(nb_website):
             try:
                 urlW = line[line.find('r:resource="') + len('r:resource="'):line.find('>') - 1]
                 htmlW = urllib.request.urllopen(urlW).read().decode('latin-1')
-                websites['dmoz'].append((deobfusc.decode(urlW), deobfusc.decode(htmlW)))
+                websites['dmoz'].append((urlW, htmlW))
             except:
                 continue
 
@@ -108,7 +110,19 @@ def dmoz_crawl(nb_website):
     
     sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website) + " / " + str(nb_website) + ENDC + ' '*10 + BOLD + OKGREEN + 'Termine !' + ENDC + '\n\n')
 
+def getObfuscFeatures(url, code):
+    """ Cette fonction calcule les features en relation avec l'obfuscation 
+    1) Difference entre l'URL décodé en l'original
+    2) Difference entre le code source décodé et l'original
+    3) Taille de l'URL original """
+    return (len(url) - len(deobfusc.decode(url))), (len(code) -len(deobfusc.decode(code))), len(url)
+
+def getSuspFeatures(url, code):
+    """ Cette fonction calcule les suspicious-based features 
+    1) Nombre de domaines .
+    2) Caracteres duppliqués
+    3) Mot clés suspects """
+    return (len(re.findall('([0-9A-Za-z_-]+\\.){2}[0-9A-Za-z_-]+')) + len(re.findall('([0-9]+\\.){3}[0-9]+'))), ('<<' in (url + code) || '>>' in (url + code) )
+    
 #Test
 
-xssed_crawl(10)
-dmoz_crawl(10) 
