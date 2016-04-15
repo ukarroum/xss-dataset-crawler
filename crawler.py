@@ -38,6 +38,8 @@ websites = {'xssed' : [], 'dmoz' : []}
 
 features = []
 
+htmlFeat = ['<script>', '<iframe>', '<meta>', '<div>', 'href', 'http-equiv', 'lowsrc', 'onclick', 'onmouseover', 'onload', 'window', 'location', 'document', 'cookie', 'referrer', 'innerhtml', 'write()', 'getelementbytagname()', 'alert()', 'eval()']
+
 def xssed_crawl(nb_website):
 
     print(BOLD + OKGREEN + "Crawling des pages inféctés depuis www.xssed.com" + ENDC + '\n')
@@ -125,7 +127,21 @@ def getSuspFeatures(url, code):
     2) Caracteres duppliqués
     3) Mot clés suspects """
     return (len(re.findall('([0-9A-Za-z_-]+\\.){2}[0-9A-Za-z_-]+')) + len(re.findall('([0-9]+\\.){3}[0-9]+'))), ('<<' in (url + code) or '>>' in (url + code) )
+   
+def gerTagsSchemes(code):
+    """Cette fonction retourne les features en relation avec le HTML Tags """
+    code = code.lower()
+
+    tagsF = []
     
+    for e in htmlFeat:
+        if e in code:
+            tagsF.append(1)
+        else:
+            tagsF.append(0)
+    
+    return tagsF
+ 
 #Test
 xssed_crawl(45000)
 dmoz_crawl(45000)
