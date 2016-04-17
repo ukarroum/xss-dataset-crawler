@@ -79,8 +79,6 @@ def xssed_crawl(nb_website):
             except:
                 continue
             
-            print(vulnUrl)
-            print(trueUrl)
             websites['xssed'].append( ( trueUrl, vulnHtml ) )
             sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - websites_remaining + 1) + " / " + str(nb_website) + ENDC) 
             sys.stdout.flush()
