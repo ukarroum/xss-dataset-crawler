@@ -63,13 +63,15 @@ def xssed_crawl(nb_website):
                 continue
 
             vulnUrl = mirrorHtml[mirrorHtml.find("http://vuln.xssed.net/"):mirrorHtml.find('"', mirrorHtml.find("http://vuln.xssed.net/"))]
-            
+            trueUrl = mirrorHtml[mirrorHtml.find("URL: ") + 5:mirrorHtml.find('</th', mirrorHtml.find("URL: "))] 
             try:
                 vulnHtml = urllib.request.urlopen(vulnUrl).read().decode('latin-1')
             except:
                 continue
-
-            websites['xssed'].append( ( vulnUrl, vulnHtml ) )
+            
+            print(vulnUrl)
+            print(trueUrl)
+            websites['xssed'].append( ( trueUrl, vulnHtml ) )
             sys.stdout.write("\r" + OKBLUE + "Avancement : " + str(nb_website - websites_remaining + 1) + " / " + str(nb_website) + ENDC) 
             sys.stdout.flush()
 
@@ -143,8 +145,8 @@ def gerTagsSchemes(code):
     return tagsF
  
 #Test
-xssed_crawl(45000)
-dmoz_crawl(45000)
+xssed_crawl(10000)
+#dmoz_crawl(45000)
 
 f = open('xss_dataset.pickle', 'wb')
 pickle.dump(websites, f)

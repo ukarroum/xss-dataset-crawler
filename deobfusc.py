@@ -71,8 +71,10 @@ def charcode2str(code):
         pos = code.find("String.fromCharCode")
         hiddenStr = code[code.find("(", pos) + 1:code.find(")", pos)]
         hiddenStr = hiddenStr.split(',')
-        hiddenStr = [ int(x) for x in hiddenStr ]
-       
+        try:
+            hiddenStr = [ int(x) for x in hiddenStr ]
+        except:
+            continue
         code = code[:pos] + ''.join(map(chr, hiddenStr)) + code[code.find(")", pos) + 1:] 
     return code
 
