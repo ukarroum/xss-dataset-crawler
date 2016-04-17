@@ -64,6 +64,16 @@ def xssed_crawl(nb_website):
 
             vulnUrl = mirrorHtml[mirrorHtml.find("http://vuln.xssed.net/"):mirrorHtml.find('"', mirrorHtml.find("http://vuln.xssed.net/"))]
             trueUrl = mirrorHtml[mirrorHtml.find("URL: ") + 5:mirrorHtml.find('</th', mirrorHtml.find("URL: "))] 
+
+            items = re.findall("&gt;", trueUrl)
+            for item in items:
+                trueUrl = trueUrl.replace(item, ">")
+
+            items = re.findall("&lt;", trueUrl)
+            for item in items:
+                trueUrl = trueUrl.replace(item, "<")
+
+
             try:
                 vulnHtml = urllib.request.urlopen(vulnUrl).read().decode('latin-1')
             except:
