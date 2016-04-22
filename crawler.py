@@ -40,26 +40,27 @@ features = []
 
 htmlFeat = ['<script>', '<iframe>', '<meta>', '<div>', 'href', 'http-equiv', 'lowsrc', 'onclick', 'onmouseover', 'onload', 'window', 'location', 'document', 'cookie', 'referrer', 'innerhtml', 'write()', 'getelementbytagname()', 'alert()', 'eval()']
 
-def xssed_crawl(nb_website):
+def xssed_crawl(nb_website, page = 1):
 
     print(BOLD + OKGREEN + "Crawling des pages inféctés depuis www.xssed.com" + ENDC + '\n')
 
     websites_remaining = nb_website
-    page = 1
 
     while(websites_remaining):
 
         try:
-            parentHtml = urllib.request.urlopen('http://www.xssed.com/archive/page=' + str(page) + '/').read().decode('utf-8')
-        except:
+            parentHtml = urllib.request.urlopen('http://www.xssed.com/archive/page=' + str(page) + '/').read().decode('latin-1')
+        except Exception as e:
+            print('\n' + "Erreur : " + FAIL + str(e.type) + " = " + str(e) + ENDC + '\n')
             continue
 
         for website in [m.start() + len("/mirror/") for m in re.finditer("/mirror/", parentHtml)]:
             mirrorInd = parentHtml[website:parentHtml.find("/", website)]
             
             try:
-                mirrorHtml = urllib.request.urlopen('http://www.xssed.com/mirror/' + str(mirrorInd) + '/').read().decode('utf-8')
-            except:
+                mirrorHtml = urllib.request.urlopen('http://www.xssed.com/mirror/' + str(mirrorInd) + '/').read().decode('latin-1')
+            except Exception as e:
+                print('\n' + "Erreur : " + FAIL + str(type(e)) + " = " + str(e) + ENDC + '\n')
                 continue
 
             vulnUrl = mirrorHtml[mirrorHtml.find("http://vuln.xssed.net/"):mirrorHtml.find('"', mirrorHtml.find("http://vuln.xssed.net/"))]
@@ -76,7 +77,8 @@ def xssed_crawl(nb_website):
 
             try:
                 vulnHtml = urllib.request.urlopen(vulnUrl).read().decode('latin-1')
-            except:
+            except Exception as e:
+                print('\n' + "Erreur : " + FAIL + str(type(e)) + " = " + str(e) + ENDC + '\n')
                 continue
             
             websites['xssed'].append( ( trueUrl, vulnHtml ) )
@@ -114,7 +116,8 @@ def dmoz_crawl(nb_website):
                 urlW = line[line.find('r:resource="') + len('r:resource="'):line.find('>') - 1]
                 htmlW = urllib.request.urllopen(urlW).read().decode('latin-1')
                 websites['dmoz'].append((urlW, htmlW))
-            except:
+            except Exception as e:
+                print('\n' + "Erreur : " + FAIL + str(type(e)) + " = " + str(e) + ENDC + '\n')
                 continue
 
             website_remaining -= 1
@@ -153,8 +156,7 @@ def gerTagsSchemes(code):
     return tagsF
  
 #Test
-xssed_crawl(10000)
-#dmoz_crawl(45000)
+xssed_crawl(3000, 1)
 
-f = open('xss_dataset.pickle', 'wb')
+f = open('xss_dataset_1.pickle', 'wb')
 pickle.dump(websites, f)
