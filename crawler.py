@@ -21,6 +21,7 @@ import re
 import sys
 import os.path
 import pickle
+import signal
 
 import deobfusc
  
@@ -40,6 +41,10 @@ features = []
 
 htmlFeat = ['<script>', '<iframe>', '<meta>', '<div>', 'href', 'http-equiv', 'lowsrc', 'onclick', 'onmouseover', 'onload', 'window', 'location', 'document', 'cookie', 'referrer', 'innerhtml', 'write()', 'getelementbytagname()', 'alert()', 'eval()']
 
+
+def timeoutHandler(signum, frame):
+    raise Exception('Timeout')
+     
 def xssed_crawl(nb_website, page = 1):
 
     print(BOLD + OKGREEN + "Crawling des pages inféctés depuis www.xssed.com" + ENDC + '\n')
@@ -55,6 +60,8 @@ def xssed_crawl(nb_website, page = 1):
             continue
 
         for website in [m.start() + len("/mirror/") for m in re.finditer("/mirror/", parentHtml)]:
+            signal.alarm(60*10) #Si l'iteration met plus de 10 minutes je la saute simplement 
+
             mirrorInd = parentHtml[website:parentHtml.find("/", website)]
             
             try:
@@ -88,6 +95,8 @@ def xssed_crawl(nb_website, page = 1):
             websites_remaining -= 1
             if(not websites_remaining):
                 break;
+
+            signal.alarm(0)
                 
         page += 1
     
@@ -154,9 +163,10 @@ def gerTagsSchemes(code):
             tagsF.append(0)
     
     return tagsF
- 
-#Test
-xssed_crawl(3000, 1)
 
-f = open('xss_dataset_1.pickle', 'wb')
+signal.signal(signal.SIGALRM, timeoutHandler)
+#Test
+xssed_crawl(3000, 401)
+
+f = open('xss_dataset_5.pickle', 'wb')
 pickle.dump(websites, f)
