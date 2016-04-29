@@ -41,7 +41,6 @@ features = []
 
 htmlFeat = ['<script>', '<iframe>', '<meta>', '<div>', 'href', 'http-equiv', 'lowsrc', 'onclick', 'onmouseover', 'onload', 'window', 'location', 'document', 'cookie', 'referrer', 'innerhtml', 'write()', 'getelementbytagname()', 'alert()', 'eval()']
 
-
 def timeoutHandler(signum, frame):
     raise Exception('Timeout')
      
@@ -143,6 +142,7 @@ def getObfuscFeatures(url, code):
     3) Taille de l'URL original """
     return (len(url) - len(deobfusc.decode(url))), (len(code) -len(deobfusc.decode(code))), len(url)
 
+#Pour le moment je n'utilise pas de features en relation avec les mot clés suspects je verrai ce que ca donne
 def getSuspFeatures(url, code):
     """ Cette fonction calcule les suspicious-based features 
     1) Nombre de domaines .
@@ -166,7 +166,19 @@ def gerTagsSchemes(code):
 
 signal.signal(signal.SIGALRM, timeoutHandler)
 #Test
-xssed_crawl(3000, 401)
+xssed_crawl(3000, 601)
 
-f = open('xss_dataset_5.pickle', 'wb')
+f = open('xss_dataset_7.pickle', 'wb')
+pickle.dump(websites, f)
+xssed_crawl(3000, 701)
+
+f = open('xss_dataset_8.pickle', 'wb')
+pickle.dump(websites, f)
+xssed_crawl(3000, 801)
+
+f = open('xss_dataset_9.pickle', 'wb')
+pickle.dump(websites, f)
+xssed_crawl(3000, 901)
+
+f = open('xss_dataset_10.pickle', 'wb')
 pickle.dump(websites, f)

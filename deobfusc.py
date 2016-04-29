@@ -24,7 +24,11 @@ def hex2str(code):
     items = re.findall("\\\\x[0-9A-Fa-f]{2}", code)
     for item in items:   
         code = code.replace(item, chr(int(item[2:], 16)))
-        
+    
+    items = re.findall("%[0-9A-Fa-f]{2}", code)
+    for item in items:
+        code = code.replace(item, chr(int(item[1:], 16)))
+            
     return code
 
 def dec2str(code):
@@ -36,7 +40,7 @@ def dec2str(code):
 
 def oct2str(code):
 
-    items = re.findall("\\\\[0-9]{3}", code)
+    items = re.findall("\\\\[0-7]{3}", code)
     for item in items:   
         code = code.replace(item, chr(int(item[1:], 8)))
         
@@ -57,9 +61,11 @@ def unicode2str(code):
 def base642str(code):
 
     items = re.findall("base64,[0-9a-zA-Z+/=]+", code)
-    for item in items:   
-        code = code.replace(item, base64.b64decode(item[7:]).decode('utf-8'))
-        
+    for item in items:  
+        try: 
+            code = code.replace(item, base64.b64decode(item[7:]).decode('utf-8'))
+        except:
+            continue
     return code
     
 def url2str(code):
@@ -74,7 +80,9 @@ def charcode2str(code):
         try:
             hiddenStr = [ int(x) for x in hiddenStr ]
         except:
+            code = code[:pos] + code[pos + len("String.fromCharCode"):]
             continue
+
         code = code[:pos] + ''.join(map(chr, hiddenStr)) + code[code.find(")", pos) + 1:] 
     return code
 
